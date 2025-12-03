@@ -1,0 +1,58 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: agentcis-internal
+  namespace: argocd
+spec:
+  description: agentcis-internalstructure project for monitoring and agentcis-internal structure components
+
+  # Allow repositories for monitoring stack and agentcis-internalstructure
+  sourceRepos:
+    - https://github.com/subashglobalyhub/subash-k8s-ecosystem.git
+    - https://prometheus-community.github.io/helm-charts
+    - https://grafana.github.io/helm-charts
+    - "*"  # Allow any additional Helm charts or Git repos if needed
+
+  # Allow deploying to all necessary namespaces for agentcis-internalstructure components
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: monitoring
+    - server: https://kubernetes.default.svc
+      namespace: argocd
+    - server: https://kubernetes.default.svc
+      namespace: kube-system
+    - server: https://kubernetes.default.svc
+      namespace: "*"  # Allow any namespace for flexibility
+    - server: "*"  # Allow any cluster if multi-cluster setup is needed
+      namespace: "*"
+
+  # Allow all cluster-scoped resources (needed for CRDs, ClusterRoles, etc.)
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+
+  # Allow all namespace-scoped resources
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"
+
+  # Orphaned resources handling
+  orphanedResources:
+    warn: true
+
+  # Optional: Role definitions for project-level RBAC
+  roles:
+    - name: admin
+      description: Admin privileges for agentcis-internal project
+      policies:
+        - p, proj:agentcis-internal:admin, applications, *, agentcis-internal/*, allow
+      groups:
+        - agentcis-internal-admins
+
+    - name: developer
+      description: Developer privileges for agentcis-internal project
+      policies:
+        - p, proj:agentcis-internal:developer, applications, get, agentcis-internal/*, allow
+        - p, proj:agentcis-internal:developer, applications, sync, agentcis-internal/*, allow
+      groups:
+        - agentcis-internal-developers

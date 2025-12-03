@@ -1,0 +1,58 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: agentcis-microservice
+  namespace: argocd
+spec:
+  description: agentcis-microservice structure project for monitoring and infrastructure components
+
+  # Allow repositories for monitoring stack and agentcis-microservicestructure
+  sourceRepos:
+    - https://github.com/subashglobalyhub/subash-k8s-ecosystem.git
+    - https://prometheus-community.github.io/helm-charts
+    - https://grafana.github.io/helm-charts
+    - "*"  # Allow any additional Helm charts or Git repos if needed
+
+  # Allow deploying to all necessary namespaces for agentcis-microservicestructure components
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: monitoring
+    - server: https://kubernetes.default.svc
+      namespace: argocd
+    - server: https://kubernetes.default.svc
+      namespace: kube-system
+    - server: https://kubernetes.default.svc
+      namespace: "*"  # Allow any namespace for flexibility
+    - server: "*"  # Allow any cluster if multi-cluster setup is needed
+      namespace: "*"
+
+  # Allow all cluster-scoped resources (needed for CRDs, ClusterRoles, etc.)
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+
+  # Allow all namespace-scoped resources
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"
+
+  # Orphaned resources handling
+  orphanedResources:
+    warn: true
+
+  # Optional: Role definitions for project-level RBAC
+  roles:
+    - name: admin
+      description: Admin privileges for agentcis-microservice project
+      policies:
+        - p, proj:agentcis-microservice:admin, applications, *, agentcis-microservice/*, allow
+      groups:
+        - agentcis-microservice-admins
+
+    - name: developer
+      description: Developer privileges for agentcis-microservice project
+      policies:
+        - p, proj:agentcis-microservice:developer, applications, get, agentcis-microservice/*, allow
+        - p, proj:agentcis-microservice:developer, applications, sync, agentcis-microservice/*, allow
+      groups:
+        - agentcis-microservice-developers
