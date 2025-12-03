@@ -4,27 +4,25 @@ metadata:
   name: argocd-server-ingress
   namespace: argocd
   annotations:
+    kubernetes.io/ingress.class: contour-internal
     cert-manager.io/cluster-issuer: lets-encrypt-production
-    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    # Increase header size (Argo CD sends large headers)
-    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
-    nginx.ingress.kubernetes.io/proxy-buffers-number: "8"
-
+    ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    projectcontour.io/websocket-routes: "/"
 spec:
   ingressClassName: nginx
   tls:
-    - hosts:
-        - argocd.subash.com
-      secretName: argocd-https-secret-tls
+  - hosts:
+    - argocd.subash.com
+    secretName: argocd-https-secret-tls
   rules:
-    - host: argocd.subash.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: argocd-server
-                port:
-                  number: 80
+  - host: argocd.subash.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: argocd-server
+            port:
+              number: 80

@@ -1,0 +1,15 @@
+controller:
+  hostNetwork: true
+  ingressClass: nginx
+  dnsPolicy: ClusterFirstWithHostNet  # Recommended for hostNetwork mode
+  hostPort:
+    enabled: true
+    ports:
+      http: 80
+      https: 443
+
+ingressClassResource:
+  name: nginx
+  enabled: true
+  default: false  # Set to true if you want this as the default IngressClass
+  controllerValue: k8s.io/ingress-nginx
