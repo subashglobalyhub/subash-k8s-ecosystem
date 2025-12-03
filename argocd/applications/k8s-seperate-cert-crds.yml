@@ -33,8 +33,6 @@ metadata:
     argocd.argoproj.io/sync-wave: "0"
   # finalizers:
   #   - resources-finalizer.argocd.argoproj.io
-data:
-  timeout.reconciliation: 60s
 spec:
   project: default
   sources:

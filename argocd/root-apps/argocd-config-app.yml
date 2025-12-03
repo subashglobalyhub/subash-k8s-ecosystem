@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-config
+  namespace: argocd
+spec:
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: argocd/argocd-config
+    repoURL: https://github.com/subashglobalyhub/subash-k8s-ecosystem.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: false  # IMPORTANT: Don't prune ArgoCD's own config
+    syncOptions:
+      - CreateNamespace=true
