@@ -1,0 +1,37 @@
+# Minimal values for cert-manager
+global:
+  leaderElection:
+    namespace: cert-manager
+
+# Resource limits
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 32Mi
+
+webhook:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 32Mi
+
+cainjector:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 32Mi
+
+# Enable Prometheus metrics (optional)
+prometheus:
+  enabled: true
+  servicemonitor:
+    enabled: false  # Set to true if you have Prometheus Operator

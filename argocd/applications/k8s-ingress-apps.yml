@@ -1,19 +1,21 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kube-prometheus-stack
+  name: ingress-nginx
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
-  project: infra # TODO: change to infra
+  project: default
   sources:
   - repoURL: https://kubernetes.github.io/ingress-nginx
-    chart: kube-prometheus-stack
-    targetRevision: 69.0.0  # ADD THIS - specify the chart version
+    chart: ingress-nginx  # Fixed: was kube-prometheus-stack
+    targetRevision: 4.14.0  # Latest chart version
     helm:
       valueFiles:
         - $values/gitops/k8s-default-values/k8s-ingress-values.yml
   - repoURL: https://github.com/subashglobalyhub/subash-k8s-ecosystem.git
-    targetRevision: main # TODO: change it when we finish testing
+    targetRevision: main
     ref: values
   destination:
     server: https://kubernetes.default.svc

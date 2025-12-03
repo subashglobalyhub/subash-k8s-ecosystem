@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default  # Change to 'infra' if you have that project
+  sources:
+  - repoURL: https://charts.jetstack.io
+    chart: cert-manager
+    targetRevision: v1.19.1  # Stable version (v1.19.1 is latest but use stable for production)
+    helm:
+      # Install CRDs as part of the Helm release
+      parameters:
+        - name: crds.enabled
+          value: "true"
+      valueFiles:
+        - $values/gitops/k8s-default-values/k8s-cert-manager-values.yml
+  - repoURL: https://github.com/subashglobalyhub/subash-k8s-ecosystem.git
+    targetRevision: main
+    ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+  # Add sync waves to ensure proper ordering
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
